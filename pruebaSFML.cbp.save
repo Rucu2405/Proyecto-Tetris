@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="pruebaSFML" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/pruebaSFML" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="SFML/include" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add library="sfml-graphics" />
+					<Add library="sfml-window" />
+					<Add library="sfml-system" />
+					<Add library="sfml-audio" />
+					<Add directory="SFML/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/pruebaSFML" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="include/ArchivoTetris.h" />
+		<Unit filename="include/Bloques.h" />
+		<Unit filename="include/Colores.h" />
+		<Unit filename="include/Game.h" />
+		<Unit filename="include/Jugador.h" />
+		<Unit filename="include/Menu.h" />
+		<Unit filename="include/Posicion.h" />
+		<Unit filename="include/Tablero.h" />
+		<Unit filename="include/musicaSonidos.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/ArchivoTetris.cpp" />
+		<Unit filename="src/Bloques.cpp" />
+		<Unit filename="src/Colores.cpp" />
+		<Unit filename="src/Game.cpp" />
+		<Unit filename="src/Jugador.cpp" />
+		<Unit filename="src/Menu.cpp" />
+		<Unit filename="src/Posicion.cpp" />
+		<Unit filename="src/Tablero.cpp" />
+		<Unit filename="src/musicaSonidos.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
