@@ -1,0 +1,13 @@
+#include "Posicion.h"
+
+Posicion::Posicion()
+{
+    tamCelda=30;
+    columnasTableroX=10;
+    filasTableroY=18;
+mitadVentanaX=25;
+mitadVentanaY=30;
+
+}
+
+

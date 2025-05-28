@@ -1,0 +1,66 @@
+#include "musicaSonidos.h"
+#include <iostream>
+
+musicaSonidos::musicaSonidos()
+{
+     if (!musicaPartida.openFromFile("medios\\sonidos\\musica\\partida.ogg"))
+    {
+        std::cout<<"No esta la cancion"<<std::endl;
+    }
+    //ctor
+}
+
+void musicaSonidos::musicaFondoPartida()
+{
+   
+
+    musica.play();
+    musica.setVolume(10);
+    musica.setLoop(true);
+
+}
+
+void musicaSonidos::musicaFondoMenu()
+{
+    if (!musicaMenu.openFromFile("medios\\sonidos\\musica\\strobelite.wav"))
+    {
+        std::cout<<"No esta la cancion"<<std::endl;
+    }
+    musicaMenu.play();
+    musicaMenu.setVolume(10);
+    musicaMenu.setLoop(true);
+}
+
+void musicaSonidos::soundFijarBloque()
+{
+    if (!buffer.loadFromFile("medios\\sonidos\\efectos\\colisionBloque.ogg"))
+    {
+        std::cout<<"No esta el sonido"<<std::endl;
+    }
+    sound.setBuffer(buffer);
+    sound.play();
+    sound.setVolume(100);
+}
+void musicaSonidos::sonidoLineaCompleta()
+{
+
+    if (!buffer.loadFromFile("medios\\sonidos\\efectos\\linea.ogg"))
+    {
+        std::cout<<"No esta el sonido"<<std::endl;
+    }
+    sound.setBuffer(buffer);
+    sound.play();
+    sound.setVolume(100);
+
+}
+
+void musicaSonidos::soundGiro()
+{
+    if (!buffer.loadFromFile("medios\\sonidos\\efectos\\giro.ogg"))
+    {
+        std::cout<<"No esta el sonido"<<std::endl;
+    }
+    sound.setBuffer(buffer);
+    sound.play();
+    sound.setVolume(100);
+}

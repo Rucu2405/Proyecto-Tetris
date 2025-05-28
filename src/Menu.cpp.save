@@ -1,0 +1,172 @@
+#include "Menu.h"
+#include <iostream>
+
+
+Menu::Menu()
+{
+
+
+    if (!fondoMenuTexture.loadFromFile("medios\\fondos\\pantalla\\menu.png"))////Menu
+    {
+        std::cout<<"fondo NO encontrado";
+    }
+    // Crear un sprite para el fondo
+    fondoMenuSprite.setTexture(fondoMenuTexture);
+
+    if (!fondoPuntuacionTexture.loadFromFile("medios\\fondos\\pantalla\\puntuacion.png"))///Puntuacion
+    {
+        std::cout<<"fondo NO encontrado";
+    }
+    // Crear un sprite para el fondo
+    fondoPuntuacionSprite.setTexture(fondoPuntuacionTexture);
+
+
+    if (!fuenteMenu.loadFromFile("medios\\fuentes\\menu.ttf"))
+    {
+        std::cout<<"Fuente no encontrada"<<std::endl;
+    }
+    if (!fuentePartida.loadFromFile("medios\\fuentes\\partida.ttf"))
+    {
+        std::cout<<"Fuente no encontrada"<<std::endl;
+    }
+
+    if (!fuentePuntos.loadFromFile("medios\\fuentes\\puntos.ttf"))
+    {
+        std::cout<<"Fuente no encontrada"<<std::endl;
+    }
+
+
+    for(int i=0; i<11; i++)
+    {
+        interfazPuntos[i].setFont(fuentePuntos);
+        interfazPuntos[i].setColor(sf::Color::White);
+    }
+
+    interfazGame[0].setFont(fuentePartida);
+    interfazGame[0].setColor(sf::Color::White);
+    interfazGame[0].setPosition(pos.mitadVentanaX-200,200);
+
+    interfazGame[1].setFont(fuentePartida);
+    interfazGame[1].setColor(sf::Color::White);
+    interfazGame[1].setPosition(pos.mitadVentanaX-200,300);
+
+     interfazGame[2].setFont(fuentePartida);
+    interfazGame[2].setColor(sf::Color::White);
+    interfazGame[2].setPosition(pos.mitadVentanaX+320,200);
+    interfazGame[2].setCharacterSize(27);
+
+    interfazGame[3].setFont(fuentePartida);
+    interfazGame[3].setColor(sf::Color::White);
+    interfazGame[3].setPosition(pos.mitadVentanaX+200,400);
+    interfazGame[3].setCharacterSize(10);
+
+    //iniciar partida
+    menu[0].setFont(fuenteMenu);
+    menu[0].setColor(colorSeleccionado);
+    menu[0].setString("Iniciar partida");
+    menu[0].setPosition(pos.mitadVentanaX-50,200);
+
+    //Puntajes mas altos
+    menu[1].setFont(fuenteMenu);
+    menu[1].setColor(colorLibre);
+    menu[1].setString("Puntajes mas altos");
+    menu[1].setPosition(pos.mitadVentanaX-50,300);
+
+    //salir
+    menu[2].setFont(fuenteMenu);
+    menu[2].setColor(colorLibre);
+    menu[2].setString("Salir");
+    menu[2].setPosition(pos.mitadVentanaX-50,400);
+
+
+    opcionElegidaMenu=0;
+
+
+    textNombre.setFont(fuentePuntos);
+    textPuntos.setFont(fuentePuntos);
+}
+
+void Menu::drawMenu(sf::RenderWindow &window)
+{
+    window.draw(fondoMenuSprite);
+//3 la cantidad de items del menu
+    for(int i=0; i<3; i++)
+    {
+        window.draw(menu[i]);
+    }
+
+}
+
+void Menu::menuArriba()
+{
+    if(opcionElegidaMenu-1>=0)
+    {
+        menu[opcionElegidaMenu].setColor(colorLibre);
+        opcionElegidaMenu--;
+        menu[opcionElegidaMenu].setColor(colorSeleccionado);
+    }
+}
+
+void Menu::menuAbajo()
+{
+    if(opcionElegidaMenu+1<3)
+    {
+        menu[opcionElegidaMenu].setColor(colorLibre);
+        opcionElegidaMenu++;
+        menu[opcionElegidaMenu].setColor(colorSeleccionado);
+    }
+}
+
+int Menu::getOpcionElegida()
+{
+    return opcionElegidaMenu;
+
+}
+
+
+void Menu::interfazPartida(sf::RenderWindow &window,int &puntos,int &filas)
+{
+    interfazGame[0].setString("Puntos: \n" + std::to_string(puntos));
+    interfazGame[1].setString("Filas: \n" + std::to_string(filas));
+    interfazGame[2].setString("Siguiente \n");
+    interfazGame[3].setString("Controles\n Mover bloque con : ");
+
+
+
+    for(int i=0; i<4; i++)
+    {
+        window.draw(interfazGame[i]);
+    }
+
+}
+
+void Menu::interfazPuntuaciones(sf::RenderWindow &window,Jugador *jugadoresPuntajes,int cantidadRegistros)
+{
+    window.draw(fondoPuntuacionSprite);
+
+    ///aca va el rectangulo
+    interfazPuntos[10].setString("Jugador\tPuntos\n");
+    interfazPuntos[10].setPosition(pos.mitadVentanaX-50,0);
+
+    window.draw(interfazPuntos[10]);
+
+    if(cantidadRegistros>10)
+    {
+        //Por pantalla mostramos solo 10
+        cantidadRegistros=10;
+    }
+
+    for (int i = 0; i < cantidadRegistros; i++)
+    {
+        textNombre.setString(jugadoresPuntajes[i].nombreJugadorAguardar);
+        textNombre.setPosition(pos.mitadVentanaX - 50, 60 + (i * 50));
+
+        textPuntos.setString(std::to_string(jugadoresPuntajes[i]._puntaje));
+        textPuntos.setPosition(pos.mitadVentanaX+160, 60 + (i * 50));
+
+        window.draw(textNombre);
+        window.draw(textPuntos);
+    }
+
+    window.display();
+}

@@ -1,0 +1,100 @@
+#include "Jugador.h"
+#include <cstring>
+Jugador::Jugador()
+{
+   _puntaje = 0;
+
+    if (!fondoIngresarNombreTexture.loadFromFile("medios\\fondos\\pantalla\\1.png"))
+    {
+        std::cout<<"fondo NO encontrado";
+    }
+    // Crear un sprite para el fondo
+    fondoIngresarNombreSprite.setTexture(fondoIngresarNombreTexture);
+
+    if (!fuente.loadFromFile("medios\\fuentes\\arial.ttf"))
+    {
+        std::cout<<"Fuente no encontrada"<<std::endl;
+    }
+
+    mensaje.setFont(fuente);
+    mensaje.setFillColor(sf::Color::White);
+    mensaje.setString("Ingrese su Nombre");
+    mensaje.setPosition(100, 100);
+
+    nombreUsuarioPorPantalla.setFont(fuente);
+    nombreUsuarioPorPantalla.setFillColor(sf::Color::White);
+    nombreUsuarioPorPantalla.setPosition(200, 150);
+
+}
+
+void Jugador::ingresarNombre(sf::RenderWindow &_window,int puntaje,bool &irAmenu)
+{
+    _puntaje=puntaje;
+ nombreJugadorIngresando = "";
+   nombreUsuarioPorPantalla.setString(nombreJugadorIngresando);
+
+    sf::Event evento;
+
+    while (!irAmenu)  // Mantener en bucle hasta que el usuario confirme el nombre
+    {
+        while (_window.pollEvent(evento))
+        {
+            if (evento.type == sf::Event::Closed)
+            {
+                _window.close();
+                return;
+            }
+
+            if (evento.type == sf::Event::TextEntered)
+            {
+                if ( (evento.text.unicode < 128 && nombreJugadorIngresando.size() < 21) || (evento.text.unicode == '\b'))///obtiene el caracter imprimible
+
+                {
+
+                    if (evento.text.unicode == '\b')  // '\b' es el código ASCII para BackSpace
+                    {
+                        if (!nombreJugadorIngresando.empty())
+                        {
+                            nombreJugadorIngresando.pop_back();
+                            nombreUsuarioPorPantalla.setString(nombreJugadorIngresando);
+                        }
+                    }
+                    else
+                   {
+                        nombreJugadorIngresando += static_cast<char>(evento.text.unicode);
+                        nombreUsuarioPorPantalla.setString(nombreJugadorIngresando);
+                    }
+                }
+            }
+
+            if (evento.type == sf::Event::KeyPressed)
+            {
+                if (evento.key.code == sf::Keyboard::Return)
+                {
+                    const char *nombre = nombreJugadorIngresando.c_str();
+                    strcpy(nombreJugadorAguardar,nombre);
+                   // irAmenu=true;
+                   return;
+                }
+            }
+            _window.clear();
+            _window.draw(fondoIngresarNombreSprite);
+            _window.draw(mensaje);
+            _window.draw(nombreUsuarioPorPantalla);
+            _window.display();
+        }
+    }
+}
+
+void Jugador::Mostrar()  /// mostramos la info del jugador
+{
+   ///mostrar por pantalla;
+
+    std::cout << "Jugador : \n" << nombreJugadorAguardar;
+    std::cout << "\tPuntaje: " << _puntaje << std::endl;
+
+}
+
+  void Jugador::getNombre();
+    void getPuntaje();
+

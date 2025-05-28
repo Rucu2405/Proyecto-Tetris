@@ -1,0 +1,312 @@
+#include "Bloques.h"
+#include <iostream>
+#include <vector>
+#include <cstdlib>  	// rand, srand
+#include <ctime>     	// time
+
+Bloques::Bloques()
+{
+    color=c.getColores();
+    text.loadFromFile("medios\\fondos\\tableros\\celda.png");
+    // Definición de las formas de Tetris
+    srand(time(nullptr));
+    celda.setSize(sf::Vector2f(p.tamCelda,p.tamCelda));//tamaño 30.
+    celda.setTexture(&text);
+    formasTetris=
+    {
+        {
+            {0,1,0,0},
+            {0,1,0,0},
+            {0,1,0,0},
+            {0,1,0,0}
+        },
+        {
+            {0,0,2,0},
+            {0,0,2,0},
+            {0,2,2,0},
+            {0,0,0,0}
+        },
+        {
+            {0,3,0,0},
+            {0,3,0,0},
+            {0,3,3,0},
+            {0,0,0,0}
+        },
+        {
+            {0,0,0,0},
+            {0,4,4,0},
+            {0,4,4,0},
+            {0,0,0,0}
+        },
+        {
+            {0,0,0,0},
+            {0,5,5,0},
+            {5,5,0,0},
+            {0,0,0,0}
+        },
+        {
+            {0,0,0,0},
+            {6,6,0,0},
+            {0,6,6,0},
+            {0,0,0,0}
+        },
+        {
+            {0,0,0,0},
+            {7,7,7,0},
+            {0,7,0,0},
+            {0,0,0,0}
+        }
+    };
+    formaSiguiente = formasTetris;
+
+}
+
+
+
+void Bloques::crearNuevoBloque()
+{
+    if(_idBloqueSiguiente == -1)
+    {
+        /// inicializar el proximo bloque la primera vez
+        _idBloqueSiguiente = rand() %7; // Genera un valor entre 0 y 6
+
+    }
+
+    _idBloque =_idBloqueSiguiente; /// asignar el proximo bloque como el actual
+    _idBloqueSiguiente =  rand() %7;  ///generar un nuevo proximo bloque
+
+    _posicionBloqueX=(p.columnasTableroX/2)-2;
+    _posicionBloqueY=-1;
+}
+
+void Bloques::dibujarBloque(sf::RenderWindow &window)
+{
+    celda.setFillColor(color[_idBloque+1]);
+    for(int fila=0; fila<4; fila++)
+    {
+        for(int columna=0; columna<4; columna++)
+        {
+            if(formasTetris[_idBloque][fila][columna]!=0)
+            {
+                celda.setPosition(p.mitadVentanaX+((_posicionBloqueX+columna)*30),p.mitadVentanaY+((_posicionBloqueY+fila)*30));
+                if(_posicionBloqueY>=0)
+                {
+                    window.draw(celda);
+                }
+            }
+        }
+    }
+}
+
+void Bloques::dibujarProximoBloque(sf::RenderWindow &window)
+{
+    sf::Texture texture;
+
+    if (!texture.loadFromFile("medios\\bloqueSiguiente\\"+std::to_string(_idBloqueSiguiente)+".png"))
+    {
+        // error...
+    }
+
+    sf::Sprite sprite;
+    switch(_idBloqueSiguiente)
+    {
+    case 0:
+        sprite.setOrigin(15,60);
+        break;
+    case 1:
+    case 2:
+         sprite.setOrigin(30,45);
+        break;
+    case 3:
+         sprite.setOrigin(30,30);
+        break;
+    case 4:
+    case 5:
+    case 6:
+         sprite.setOrigin(45,30);
+        break;
+    }
+    sprite.setTexture(texture);
+    sf::RectangleShape recuadro;
+    recuadro.setSize(sf::Vector2f(120,120));
+    recuadro.setFillColor(sf::Color(0,0,0,50));
+    //celda.setFillColor(color[_idBloqueSiguiente + 1]);
+    for (int fila = 0; fila < 4; fila++)
+    {
+        for (int columna = 0; columna < 4; columna++)
+        {
+            if (formaSiguiente[_idBloqueSiguiente][fila][columna] != 0)
+            {
+                recuadro.setOrigin(60,60);
+                spriteFondo.setOif
+recuadro.setPosition(p.mitadVentanaX + 400, p.mitadVentanaY +260);
+spriteFondo.setPosition(p.mitadVentanaX + 400, p.mitadVentanaY +260);
+                sprite.setPosition(p.mitadVentanaX + 400, p.mitadVentanaY +260);
+                window.draw(recuadro);
+                window.draw(sprite);
+                /// Dibuja el bloque en una posición fija que le asignemos!!
+                //  celda.setPosition(p.mitadVentanaX + 360 + (columna * 30), p.mitadVentanaY + 230 + (fila * 30));
+                //window.draw(celda);
+            }
+        }
+    }
+
+
+}
+
+
+void Bloques::moverBloque(sf::Keyboard::Key key,bool partidaIniciada,int tableroJuego[18][10])
+{
+    if(partidaIniciada)
+    {
+
+        if(key == sf::Keyboard::Left)
+        {
+            _posicionBloqueX--;
+            if(limitarBloqueEnTablero(tableroJuego))///si sale del trablero
+            {
+                _posicionBloqueX++;
+            }
+        }
+        else if(key == sf::Keyboard::Right)
+        {
+            _posicionBloqueX++;
+            if(limitarBloqueEnTablero(tableroJuego))///si sale del trablero
+            {
+                _posicionBloqueX--;
+            }
+        }
+        else if(key == sf::Keyboard::Down)
+        {
+            _posicionBloqueY++;
+            if(limitarBloqueEnTablero(tableroJuego))///si sale del trablero
+            {
+                _posicionBloqueY--;
+            }
+        }
+        else if(key == sf::Keyboard::A)
+        {
+            rotarBloque(key);
+            if(limitarBloqueEnTablero(tableroJuego))///si sale del trablero
+            {
+                reiniciarBloque(key);
+            }
+
+        }
+        else if(key == sf::Keyboard::D)
+        {
+            rotarBloque(key);
+
+            if(limitarBloqueEnTablero(tableroJuego))///si sale del trablero
+            {
+                reiniciarBloque(key);
+
+            }
+
+        }
+    }
+}
+
+
+void Bloques::reiniciarBloque(sf::Keyboard::Key key)
+{
+    rotarBloque(key);
+    rotarBloque(key);
+    rotarBloque(key);
+}
+
+void Bloques::rotarBloque(sf::Keyboard::Key key)
+{
+    if(key==sf::Keyboard::A)
+    {
+        //  std::cout<<"Rotando Bloque forma antiHoraria"<<std::endl;
+        // Invertir las columnas
+        for(int fila=0; fila<4; fila++)
+        {
+            for(int columna=0; columna<4/2; columna++)// Iterar solo hasta la mitad de la fila
+            {
+                swap(formasTetris[_idBloque][fila][columna],formasTetris[_idBloque][fila][4 -columna - 1]);// Intercambiar elementos
+            }
+        }
+///trasponer filas y columnas
+        for(int fila=0; fila<4; fila++)
+        {
+            for(int columna=fila+1; columna<4; columna++)
+            {
+                swap(formasTetris[_idBloque][fila][columna],formasTetris[_idBloque][columna][fila]);
+            }
+        }
+
+    }
+
+    if(key==sf::Keyboard::D)
+    {
+        // std::cout<<"Rotando Bloque forma horaria"<<std::endl;
+///trasponer columnas y filas
+        for(int fila=0; fila<4; fila++)
+        {
+            for(int columna=fila+1; columna<4; columna++)
+            {
+                swap(formasTetris[_idBloque][fila][columna],formasTetris[_idBloque][columna][fila]);
+            }
+        }
+        // Invertir las columnas
+        for(int fila=0; fila<4; fila++)
+        {
+            for(int columna=0; columna<4/2; columna++)// Iterar solo hasta la mitad de la fila
+            {
+                swap(formasTetris[_idBloque][fila][columna],formasTetris[_idBloque][fila][4 -columna - 1]);// Intercambiar elementos
+            }
+        }
+
+    }
+    efecto.soundGiro();
+}
+
+bool Bloques::limitarBloqueEnTablero(int tableroJuego[18][10])
+{
+    for(int filas=0; filas<4; filas++)
+    {
+        for(int columnas=0; columnas<4; columnas++)
+        {
+            if(formasTetris[_idBloque][filas][columnas]!=0)
+            {
+                if(_posicionBloqueX+columnas<0 || _posicionBloqueX+columnas>=p.columnasTableroX || _posicionBloqueY+filas>= p.filasTableroY)
+                {
+                    return true;/// si se sale del tablero, retorna verdadero.
+                }
+
+                if(tableroJuego[_posicionBloqueY + filas][_posicionBloqueX + columnas]!=0)
+                {
+                    return true;/// si toca otro bloque, retorna verdadero.
+                }
+
+            }
+        }
+    }
+    return false;///si no sale del tablero, retorna falso.
+}
+
+
+void Bloques::fijarBloqueEnTablero(int tableroJuego[18][10])
+{
+    ///copia los datos del bloque en la matriz de "0"
+    for (int fila = 0; fila < 4; fila++)
+    {
+        for (int columna = 0; columna < 4; columna++)
+        {
+            if (formasTetris[_idBloque][fila][columna] != 0)
+            {
+                int columnaTablero = _posicionBloqueX + columna;
+                int filaTablero = _posicionBloqueY + fila;
+                // Asegurarse de no escribir fuera de los límites
+                if (filaTablero >= 0 && filaTablero < 18 && columnaTablero >= 0 && columnaTablero < 10)
+                {
+                    tableroJuego[filaTablero][columnaTablero] = formasTetris[_idBloque][fila][columna];
+                }
+            }
+        }
+    }
+    efecto.soundFijarBloque();
+}
+

@@ -1,0 +1,315 @@
+#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Audio.hpp>
+#include <cstdlib>  	// rand, srand
+#include <ctime>     	// time
+#include <cstring>
+#include "Game.h"
+#include <iostream>
+
+
+Game::Game()
+    : _window(sf::VideoMode(800, 600), "Tetris - Grupo 30") ///Lista de inicializacion de constructor
+      // : _window(sf::VideoMode(300, 540), "Tetris - Grupo 30") ///Lista de inicializacion de constructor
+{
+    _window.setFramerateLimit(30);
+    srand(time(nullptr));
+
+// cargando textura del fondo
+    if (!fondoTablero.loadFromFile("medios\\fondos\\pantalla\\partida.png"))
+    {
+        std::cout<<"fondo NO encontrado";
+    }
+    // Crear un sprite para el fondo
+    fondoTableroSprite.setTexture(fondoTablero);
+// cargando textura del fondo FIN
+//    tablero.mostrarTablero();
+    velocidadDeCaida=1.2f;
+    jugadoresPuntajes=nullptr;
+}
+
+void Game::run()
+{
+    while(_window.isOpen())
+    {
+        if(primerInicio ==true)
+        {
+            //musicaMenu.musicaFondoMenu();
+            primerInicio = false;
+        }
+
+        if(partidaIniciada==false && irAmenu==true)
+        {
+            musicaPartida.musica.stop();
+            procesarEventosMenu();
+        }
+
+        if(partidaIniciada==false && irAmenu==false && irApuntos==true)
+        {
+        
+            puntajePantalla();
+        }
+
+        procesarEventosPartida();
+        reloj();
+
+        if(partidaIniciada==false)
+        {
+            reiniciarVariables();
+        }
+        render();
+
+    }
+
+}
+
+
+void Game::procesarEventosMenu()
+{
+
+    sf::Event evento;
+    while (_window.pollEvent(evento))
+    {
+        switch (evento.type)
+        {
+        case sf::Event::KeyPressed:
+            switch (evento.key.code)
+            {
+            case sf::Keyboard::Escape:
+                _window.close();
+                break;
+            case sf::Keyboard::Up:
+                menu.menuArriba();
+                break;
+            case sf::Keyboard::Down:
+                menu.menuAbajo();
+                break;
+            case sf::Keyboard::Enter:
+                switch (menu.getOpcionElegida())
+                {
+                case 0:
+                    partidaIniciada = true;
+                    irAmenu=false;
+                    sf::sleep(sf::seconds(0.2));
+                    musicaMenu.musica.stop();
+                   musicaPartida.musicaFondoPartida();
+                    bloque.crearNuevoBloque();
+
+                    break;
+                case 1:
+                    irAmenu=false;
+                    irApuntos=true;
+                    obtenerJugadoresDeArchivo(puntajesVistos,jugadoresPuntajes);
+
+                    break;
+                case 2:
+                    _window.close();
+                    break;
+                }
+                break;
+            }
+            break;
+
+        case sf::Event::Closed:
+            _window.close();
+            break;
+
+        default:
+            ////
+            break;
+        }
+    }
+}
+void Game::puntajePantalla()
+{
+    obtenerJugadoresDeArchivo(puntajesVistos,jugadoresPuntajes);
+    sf::Event evento;
+    while(irAmenu==false && irApuntos==true)
+    {
+        while(_window.pollEvent(evento))
+        {
+            switch(evento.type)
+            {
+            case sf::Event::KeyPressed:
+                switch(evento.key.code)
+                {
+                case sf::Keyboard::Escape:
+                    irAmenu=true;
+                    irApuntos=false;
+                    break;
+                }
+                break;
+            }
+        }
+    }
+}
+
+void Game::procesarEventosPartida()
+{
+    sf::Event evento;
+    while(_window.pollEvent(evento))
+    {
+        switch(evento.type)
+        {
+        case sf::Event::KeyPressed:
+            switch(evento.key.code)
+            {
+            case sf::Keyboard::Left:
+            case sf::Keyboard::Right:
+            case sf::Keyboard::Down:
+            case sf::Keyboard::A:
+            case sf::Keyboard::D:
+                bloque.moverBloque(evento.key.code,partidaIniciada,tablero.tableroJuego);
+                break;
+            case sf::Keyboard::F1:
+                pantallaFinDePartida();
+                break;
+            }
+            break;
+
+        case sf::Event::Closed:
+            _window.close();
+            break;
+        }
+
+    }
+}
+void Game::reloj()
+{
+    sf::Time _elapsedTime;  // Para almacenar el tiempo transcurrido
+    // Obtener el tiempo transcurrido desde la última actualización
+    _elapsedTime = clock.getElapsedTime();
+    // Si ha pasado más de 1 segundo, reiniciamos el reloj y ejecutamos una acción
+    if (_elapsedTime.asSeconds() >velocidadDeCaida)
+    {
+        movimientoBloqueAutomatico(partidaIniciada);
+        clock.restart();
+    }
+}
+
+
+void Game::movimientoBloqueAutomatico(bool partidaIniciada)
+{
+    if(partidaIniciada)
+    {
+        bloque._posicionBloqueY++;
+        if(bloque.limitarBloqueEnTablero(tablero.tableroJuego))
+        {
+            bloque._posicionBloqueY--;
+            bloque.fijarBloqueEnTablero(tablero.tableroJuego);
+            tablero.verificarLineaCompletaEnTablero(puntajeAcumulado,filasAcumuladas);
+            velocidadPorPuntaje(puntajeAcumulado);
+            if(tablero.gameOver())
+            {
+                pantallaFinDePartida();
+            }
+            else
+            {
+                bloque.crearNuevoBloque();
+
+            }
+        }
+    }
+}
+void Game::pantallaFinDePartida()
+{
+    /// crear una pausa
+    sf::sleep(sf::seconds(0.5));
+    ///despues pasa a pantalla para poner el nombre
+    jugador.ingresarNombre(_window,puntajeAcumulado,irAmenu);
+    ///guardamos en archivo el puntaje y el nombre
+    if(archivo.grabarJugador(jugador))
+    {
+        //reiniciamos variables y volvemos al menu principal
+        reiniciarVariables();
+    }
+}
+
+void Game::velocidadPorPuntaje(int puntajeAcumulado)
+{
+    switch(puntajeAcumulado)
+    {
+    case 1000:
+        velocidadDeCaida=.8f;
+        break;
+    case 2000:
+        velocidadDeCaida=.4f;
+        break;
+    case 3000:
+        velocidadDeCaida=.2f;
+        break;
+    default:
+        break;
+    }
+}
+
+void Game::reiniciarVariables()
+{
+    puntajeAcumulado=0;
+    filasAcumuladas=0;
+    tablero.iniciarTablero();
+    partidaIniciada=false;
+    irAmenu=true;
+}
+
+void Game::obtenerJugadoresDeArchivo(bool puntajesVistos,Jugador *jugadoresPuntajes)
+{
+    ArchivoTetris archivo;
+    int cantidadRegistros = archivo.CantidadRegistrosJugadores();
+
+    if(puntajesVistos==false)
+    {
+        jugadoresPuntajes  = new Jugador[cantidadRegistros];
+        if(jugadoresPuntajes==nullptr)
+        {
+            return;
+        }
+        archivo.leerTodo(cantidadRegistros,jugadoresPuntajes);
+        puntajesVistos=true;
+    }
+
+    if(puntajesVistos==true)
+    {
+        Jugador aux;
+// Bucle principal para ordenar
+        for (int i = 0; i < cantidadRegistros; i++)
+        {
+            for (int j = 0; j < cantidadRegistros - i - 1; j++)
+            {
+                // Comparar puntajes de jugadores adyacentes
+                if (jugadoresPuntajes[j].getPuntaje() < jugadoresPuntajes[j + 1].getPuntaje())
+                {
+                    // Intercambiar si el siguiente tiene un puntaje mayor
+                    aux._puntaje = jugadoresPuntajes[j]._puntaje;
+                    jugadoresPuntajes[j]._puntaje = jugadoresPuntajes[j + 1]._puntaje;
+                    jugadoresPuntajes[j + 1]._puntaje = aux._puntaje;
+
+                    strcpy(aux.nombreJugadorAguardar,jugadoresPuntajes[j].nombreJugadorAguardar);
+                    strcpy(jugadoresPuntajes[j].nombreJugadorAguardar,jugadoresPuntajes[j+1].nombreJugadorAguardar);
+                    strcpy(jugadoresPuntajes[j+1].nombreJugadorAguardar,aux.nombreJugadorAguardar);
+                }
+            }
+        }
+        menu.interfazPuntuaciones(_window,jugadoresPuntajes,cantidadRegistros);
+    }
+
+}
+
+void Game::render()
+{
+    _window.clear(sf::Color::Red);
+
+    if(partidaIniciada==true)
+    {
+        tablero.dibujarTablero(_window,fondoTableroSprite);
+        menu.interfazPartida(_window,puntajeAcumulado,filasAcumuladas);
+        bloque.dibujarBloque(_window);
+        bloque.dibujarProximoBloque(_window);
+    }
+    else if(partidaIniciada==false || irAmenu==true)
+    {
+        menu.drawMenu(_window);
+    }
+
+    _window.display();
+}
