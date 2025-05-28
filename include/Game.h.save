@@ -1,0 +1,39 @@
+#pragma once
+#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+#include "Menu.h"
+#include "Posicion.h"
+#include "Tablero.h"
+#include "Bloques.h"
+
+class Game
+{
+private:
+    sf::RenderWindow _window;
+    Menu menu;
+    Tablero tablero;
+    Bloques bloque;
+    Posicion pos;
+    sf::Texture fondoTablero;
+    sf::Sprite fondoTableroSprite;
+    sf::Clock clock;
+    bool partidaIniciada=false;
+float velocidadDeCaida;
+
+///funciones privadas
+    void procesarEventos();
+    void render();
+    void update();
+    void reloj();
+    void movimientoBloqueAutomatico(bool partidaIniciada);
+    void pantallaFinDePartida();
+void velocidadPorPuntaje(int puntajeAcumulado);
+
+public:
+    Game();
+    void run();
+    int puntajeAcumulado=0;
+
+};
+
+

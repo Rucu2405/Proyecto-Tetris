@@ -1,0 +1,18 @@
+#pragma once
+#include "Jugador.h"
+
+class ArchivoTetris
+{
+public:
+    ArchivoTetris();
+
+    Jugador jugador;
+
+    bool grabarJugador(Jugador&jugador);
+    bool leerUnJugador(Jugador &jugador);
+    bool leerJugadores(std::vector<Jugador *jugadoresVector);
+
+
+};
+
+

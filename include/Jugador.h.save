@@ -1,0 +1,36 @@
+#pragma once
+#include <SFML/Graphics.hpp>
+#include "Posicion.h"
+#include <string>
+#include <iostream>
+
+class Jugador
+{
+public:
+    Jugador();
+
+    void ingresarNombre(sf::RenderWindow &_window,int puntaje,bool &irAmenu);
+    void Mostrar();
+    void getNombre();
+    void getPuntaje();
+
+
+    char nombreJugadorAguardar[21];
+    int _puntaje;
+
+
+
+private:
+    std::string nombreJugadorIngresando;
+
+    sf::Texture fondoIngresarNombreTexture;
+    sf::Sprite fondoIngresarNombreSprite;
+
+    sf::Font fuente;
+    sf::Text mensaje;
+
+    sf::Text nombreUsuarioPorPantalla;
+
+};
+
+

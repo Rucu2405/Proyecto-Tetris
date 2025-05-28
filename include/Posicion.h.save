@@ -1,0 +1,19 @@
+#pragma once
+
+
+class Posicion
+{
+public:
+
+    Posicion();
+    int tamCelda;
+    int offsetTableroX;
+    int offsetTableroY;
+    int offsetBloqueX;
+    int offsetBloqueY;
+    int offsetUsarioX;
+    int offsetUsarioY;
+
+
+
+};

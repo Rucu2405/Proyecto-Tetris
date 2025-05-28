@@ -1,0 +1,33 @@
+#pragma once
+#include <SFML/Graphics.hpp>
+#include "Posicion.h"
+#include "ArchivoTetris.h"
+class Menu
+{
+public:
+    Menu();
+    sf::Texture fondoMenuTexture;
+    sf::Sprite fondoMenuSprite;
+    sf::Texture fondoPuntuacionTexture;
+    sf::Sprite fondoPuntuacionSprite;
+    ArchivoTetris jugadorEnArchivo;
+    int opcionElegidaMenu;
+    void drawMenu(sf::RenderWindow &window);
+    void menuArriba();
+    void menuAbajo();
+    void interfazPartida(sf::RenderWindow &window,int &puntos,int &filas);
+    void interfazPuntuaciones(sf::RenderWindow &window,Jugador *jugadoresPuntajes,int cantidadRegistros);
+    int getOpcionElegida();
+
+
+    sf::Font fuenteMenu;
+    sf::Fonty
+    sf::Font fuentePuntos;
+    sf::Text menu[3];
+    sf::Text interfaz[3];
+    sf::Text interfazPuntos[11];
+    Posicion pos;
+
+};
+
+

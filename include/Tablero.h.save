@@ -1,0 +1,34 @@
+#pragma once
+#include <SFML/Graphics.hpp>
+#include "Posicion.h"
+#include "Bloques.h"
+#include <vector>
+
+
+class Tablero
+{
+private:
+    int _numColumnas;
+    int _numFilas;
+    float _offsetX;
+    float _offsetY;
+    sf::Vector2f _tamCelda;
+    std::vector<sf::Color> colores;
+    sf::FloatRect bordesTableroBox;
+    Posicion pos;
+    Bloques bloque;
+
+
+public:
+    Tablero();
+    virtual ~Tablero();
+    int tableroJuego[18][10];
+    void iniciarTablero();
+    void mostrarTablero();
+    void limitarBordes(sf::RenderWindow &window,int &offsetX,int &offsetY,sf::Keyboard::Key key,int idBloque);
+    void dibujarTablero(sf::RenderWindow &window, sf::Sprite &fondoDibujo);
+    sf::Vector2f getTamCelda();
+
+};
+
+
